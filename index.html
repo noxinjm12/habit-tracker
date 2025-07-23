@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Complete Habit Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #c7d2fe 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 28rem;
+            margin: 0 auto;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
+            padding: 1.5rem;
+            color: white;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            color: #bfdbfe;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .date-input {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            backdrop-filter: blur(4px);
+        }
+        .today-badge {
+            font-size: 0.875rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: #f3f4f6;
+        }
+        .nav-tab {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+        .nav-tab.active {
+            background: white;
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+        }
+        .nav-tab:hover {
+            color: #374151;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        .habits-container {
+            padding: 1rem;
+            max-height: 24rem;
+            overflow-y: auto;
+        }
+        .habit-item {
+            background: #f9fafb;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        .habit-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        .habit-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .habit-color {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+        }
+        .habit-name {
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 0.875rem;
+        }
+        .streak-badge {
+            font-size: 0.75rem;
+            background: #fed7aa;
+            color: #ea580c;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        .delete-btn {
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0.25rem;
+            border: none;
+            background: none;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .delete-btn:hover {
+            color: #ef4444;
+        }
+        .bool-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .bool-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.5rem;
+            border: 2px solid #d1d5db;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+        }
+        .bool-btn.active-true {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+        .bool-btn.active-false {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+        .bool-btn:hover {
+            border-color: #6b7280;
+        }
+        .rating-buttons {
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+        .rating-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #e5e7eb;
+        }
+        .rating-btn.active {
+            background: #fbbf24;
+            color: white;
+        }
+        .rating-btn:hover {
+            background: #d1d5db;
+        }
+        .text-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            resize: none;
+            font-family: inherit;
+        }
+        .text-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .number-input-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .number-input {
+            width: 5rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        .number-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .unit-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        .habit-status {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .mountain-container {
+            padding: 1rem;
+            background: linear-gradient(to bottom, #bae6fd 0%, #bbf7d0 100%);
+            border-top: 1px solid #e5e7eb;
+        }
+        .mountain-title {
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+        .mountain-title h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .mountain-svg {
+            width: 100%;
+            height: 8rem;
+        }
+        .add-habit-container {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .add-habit-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .add-habit-btn:hover {
+            background: #1d4ed8;
+        }
+        .add-habit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        .form-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .form-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .form-btn.primary {
+            background: #16a34a;
+            color: white;
+        }
+        .form-btn.primary:hover {
+            background: #15803d;
+        }
+        .form-btn.secondary {
+            background: #9ca3af;
+            color: white;
+        }
+        .form-btn.secondary:hover {
+            background: #6b7280;
+        }
+        .stats-container {
+            padding: 1rem;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .stats-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .motivation-text {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+        .hidden {
+            display: none;
+        }
+        
+        /* Charts Styles */
+        .charts-container {
+            padding: 1rem;
+        }
+        .chart-selector {
+            margin-bottom: 1rem;
+        }
+        .chart-selector select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        .chart-canvas {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+        }
+        .no-data {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+            padding: 2rem;
+        }
+        .chart-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .time-range-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .time-range-btn {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        .time-range-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        .time-range-btn:hover {
+            border-color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Complete Habit Tracker</h1>
+            <p>Track all 16 habits including weight loss goals</p>
+            <div class="date-selector">
+                📅
+                <input type="date" id="dateInput" class="date-input">
+                <span id="todayBadge" class="today-badge hidden">Today</span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('habits')">📝 Daily</button>
+            <button class="nav-tab" onclick="switchTab('charts')">📊 Charts</button>
+            <button class="nav-tab" onclick="switchTab('mountain')">🏔️ Progress</button>
+        </div>
+
+        <!-- Habits Tab -->
+        <div class="tab-content active" id="habitsTab">
+            <div class="habits-container" id="habitsContainer">
+                <!-- Habits will be rendered here -->
+            </div>
+
+            <div class="add-habit-container">
+                <button class="add-habit-btn" id="addHabitBtn">
+                    ➕ Add New Habit
+                </button>
+                <div class="add-habit-form hidden" id="addHabitForm">
+                    <input type="text" placeholder="Habit name" id="newHabitName" class="form-input">
+                    <select id="newHabitType" class="form-select">
+                        <option value="boolean">✅ Yes/No</option>
+                        <option value="number">🔢 Number</option>
+                        <option value="rating">⭐ Rating (1-10)</option>
+                        <option value="text">📝 Text/Journal</option>
+                    </select>
+                    <input type="text" placeholder="Unit (e.g., minutes, oz, lbs)" id="newHabitUnit" class="form-input hidden">
+                    <div class="form-buttons">
+                        <button class="form-btn primary" id="addHabitConfirm">Add Habit</button>
+                        <button class="form-btn secondary" id="addHabitCancel">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Tab -->
+        <div class="tab-content" id="chartsTab">
+            <div class="charts-container">
+                <div class="chart-selector">
+                    <select id="chartHabitSelect">
+                        <option value="">Select a habit to chart...</option>
+                    </select>
+                </div>
+                
+                <div class="time-range-selector">
+                    <button class="time-range-btn active" onclick="setTimeRange(7)">7 days</button>
+                    <button class="time-range-btn" onclick="setTimeRange(30)">30 days</button>
+                    <button class="time-range-btn" onclick="setTimeRange(90)">90 days</button>
+                </div>
+                
+                <div class="chart-container" id="chartContainer">
+                    <div class="no-data">Select a habit to view its progress chart</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mountain Tab -->
+        <div class="tab-content" id="mountainTab">
+            <div class="mountain-container">
+                <div class="mountain-title">
+                    <h3>Daily Mountain Challenge</h3>
+                </div>
+                
+                <svg viewBox="0 0 300 200" class="mountain-svg" id="mountainSvg">
+                    <!-- Sky background -->
+                    <rect x="0" y="0" width="300" height="120" fill="#87CEEB" />
+                    
+                    <!-- Mountain peaks -->
+                    <polygon points="0,120 80,40 160,120" fill="#8B7355" />
+                    <polygon points="140,120 220,20 300,120" fill="#A0522D" />
+                    
+                    <!-- Snow caps -->
+                    <polygon points="180,50 220,20 260,50" fill="#FFFFFF" />
+                    <polygon points="60,70 80,40 100,70" fill="#FFFFFF" />
+                    
+                    <!-- Ground -->
+                    <rect x="0" y="120" width="300" height="80" fill="#90EE90" />
+                    
+                    <!-- Mountain path -->
+                    <path 
+                        d="M 20,140 Q 50,130 80,120 Q 120,110 160,100 Q 190,80 220,60 Q 240,40 260,30" 
+                        stroke="#8B4513" 
+                        stroke-width="3" 
+                        fill="none" 
+                        stroke-dasharray="5,3"
+                    />
+                    
+                    <!-- Progress markers and climber will be added by JavaScript -->
+                </svg>
+            </div>
+
+            <div class="stats-container">
+                📈
+                <p class="stats-text" id="statsText">
+                    <strong id="completedCount">0</strong> of <strong id="totalCount">16</strong> habits tracked <span id="dateContext">today</span>
+                </p>
+                <p id="successMessage" class="hidden" style="font-size: 0.75rem; color: #16a34a; margin-top: 0.25rem;">🎉 All habits loaded successfully!</p>
+                <p class="motivation-text" id="motivationText" style="color: #6b7280;">🏔️ Ready to start your climb?</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default habits
+        const defaultHabits = [
+            { id: 1, name: 'AM Breathing', type: 'boolean', unit: '', color: '#EC4899' },
+            { id: 2, name: 'PM Breathing', type: 'boolean', unit: '', color: '#8B5CF6' },
+            { id: 3, name: 'Meditation', type: 'number', unit: 'minutes', color: '#6366F1' },
+            { id: 4, name: 'Sleep Hours', type: 'number', unit: 'hours', color: '#1E293B' },
+            { id: 5, name: 'Time Outside', type: 'number', unit: 'minutes', color: '#059669' },
+            { id: 6, name: 'Fruit/Veg Servings', type: 'number', unit: 'servings', color: '#65A30D' },
+            { id: 7, name: 'Exercise', type: 'number', unit: 'minutes', color: '#DC2626' },
+            { id: 8, name: 'Water Intake', type: 'number', unit: 'oz', color: '#0EA5E9' },
+            { id: 9, name: 'Resting HR', type: 'number', unit: 'bpm', color: '#EF4444' },
+            { id: 10, name: 'HRV', type: 'number', unit: 'ms', color: '#F59E0B' },
+            { id: 11, name: 'Cold Exposure', type: 'number', unit: 'minutes', color: '#06B6D4' },
+            { id: 12, name: 'Weight', type: 'number', unit: 'lbs', color: '#7C3AED' },
+            { id: 13, name: 'Gratitude Journal', type: 'text', unit: '', color: '#F97316' },
+            { id: 14, name: 'Overnight Oats Breakfast', type: 'boolean', unit: '', color: '#A855F7' },
+            { id: 15, name: 'Cottage Cheese Snack', type: 'boolean', unit: '', color: '#10B981' },
+            { id: 16, name: 'Avoided Chip Binge', type: 'boolean', unit: '', color: '#84CC16' }
+        ];
+
+        let habits = [];
+        let selectedDate = new Date().toISOString().split('T')[0];
+        let currentTimeRange = 7;
+
+        // Initialize
+        function init() {
+            // Load habits
+            const savedHabits = JSON.parse(localStorage.getItem('standaloneHabits') || '[]');
+            if (savedHabits.length === 0) {
+                habits = [...defaultHabits];
+                localStorage.setItem('standaloneHabits', JSON.stringify(habits));
+            } else {
+                habits = savedHabits;
+            }
+
+            // Set up date input
+            document.getElementById('dateInput').value = selectedDate;
+            updateDateContext();
+
+            // Set up event listeners
+            setupEventListeners();
+
+            // Render habits
+            renderHabits();
+            updateMountain();
+            updateStats();
+            updateChartSelector();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('dateInput').addEventListener('change', (e) => {
+                selectedDate = e.target.value;
+                updateDateContext();
+                renderHabits();
+                updateMountain();
+                updateStats();
+            });
+
+            document.getElementById('addHabitBtn').addEventListener('click', () => {
+                document.getElementById('addHabitBtn').classList.add('hidden');
+                document.getElementById('addHabitForm').classList.remove('hidden');
+            });
+
+            document.getElementById('newHabitType').addEventListener('change', (e) => {
+                const unitInput = document.getElementById('newHabitUnit');
+                if (e.target.value === 'number') {
+                    unitInput.classList.remove('hidden');
+                } else {
+                    unitInput.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('addHabitConfirm').addEventListener('click', addHabit);
+            document.getElementById('addHabitCancel').addEventListener('click', cancelAddHabit);
+            
+            document.getElementById('chartHabitSelect').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    renderChart(parseInt(e.target.value));
+                } else {
+                    document.getElementById('chartContainer').innerHTML = '<div class="no-data">Select a habit to view its progress chart</div>';
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function setTimeRange(days) {
+            currentTimeRange = days;
+            document.querySelectorAll('.time-range-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const selectedHabitId = document.getElementById('chartHabitSelect').value;
+            if (selectedHabitId) {
+                renderChart(parseInt(selectedHabitId));
+            }
+        }
+
+        function updateDateContext() {
+            const today = new Date().toISOString().split('T')[0];
+            const isToday = selectedDate === today;
+            
+            document.getElementById('todayBadge').classList.toggle('hidden', !isToday);
+            document.getElementById('dateContext').textContent = isToday ? 'today' : 'on this date';
+        }
+
+        function getHabitData(habitId, date) {
+            const key = `standaloneHabit_${habitId}_${date}`;
+            return JSON.parse(localStorage.getItem(key) || 'null');
+        }
+
+        function saveHabitData(habitId, date, value) {
+            const key = `standaloneHabit_${habitId}_${date}`;
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function updateHabitValue(habitId, value) {
+            saveHabitData(habitId, selectedDate, value);
+            renderHabits();
+            updateMountain();
+            updateStats();
+            
+            // Update chart if it's currently showing this habit
+            const selectedHabitId = document.getElementById('chartHabitSelect').value;
+            if (selectedHabitId && parseInt(selectedHabitId) === habitId) {
+                renderChart(habitId);
+            }
+        }
+
+        function getStreak(habitId) {
+            let streak = 0;
+            let currentDate = new Date();
+            
+            while (streak < 30) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const value = getHabitData(habitId, dateStr);
+                
+                if (value === null || value === false || value === 0 || value === '') break;
+                
+                streak++;
+                currentDate.setDate(currentDate.getDate() - 1);
+            }
+            
+            return streak;
+        }
+
+        function updateChartSelector() {
+            const select = document.getElementById('chartHabitSelect');
+            select.innerHTML = '<option value="">Select a habit to chart...</option>';
+            
+            habits.filter(habit => habit.type === 'number').forEach(habit => {
+                const option = document.createElement('option');
+                option.value = habit.id;
+                option.textContent = `${habit.name} (${habit.unit})`;
+                select.appendChild(option);
+            });
+        }
+
+        function getDataForChart(habitId, days) {
+            const data = [];
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return data;
+
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const value = getHabitData(habitId, dateStr);
+                
+                data.push({
+                    date: dateStr,
+                    dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    value: value && value !== 0 ? value : null
+                });
+            }
+            
+            return data;
+        }
+
+        function renderChart(habitId) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit || habit.type !== 'number') return;
+
+            const data = getDataForChart(habitId, currentTimeRange);
+            const container = document.getElementById('chartContainer');
+            
+            // Filter out null values for calculations
+            const validValues = data.filter(d => d.value !== null).map(d => d.value);
+            
+            if (validValues.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        No data available for ${habit.name} in the last ${currentTimeRange} days.
+                        <br><br>Start tracking this habit to see your progress chart!
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate stats
+            const avg = validValues.reduce((a, b) => a + b, 0) / validValues.length;
+            const min = Math.min(...validValues);
+            const max = Math.max(...validValues);
+            const latest = validValues[validValues.length - 1];
+
+            // Create chart
+            container.innerHTML = `
+                <div class="chart-title">${habit.name} - Last ${currentTimeRange} Days</div>
+                <canvas class="chart-canvas" id="chartCanvas"></canvas>
+                <div class="chart-stats">
+                    <span>Avg: ${avg.toFixed(1)} ${habit.unit}</span>
+                    <span>Min: ${min} ${habit.unit}</span>
+                    <span>Max: ${max} ${habit.unit}</span>
+                    <span>Latest: ${latest} ${habit.unit}</span>
+                </div>
+            `;
+
+            const canvas = document.getElementById('chartCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            drawChart(ctx, data, habit, canvas.width, canvas.height);
+        }
+
+        function drawChart(ctx, data, habit, width, height) {
+            const padding = 40;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Get valid values for scaling
+            const validData = data.filter(d => d.value !== null);
+            if (validData.length === 0) return;
+
+            const values = validData.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const valueRange = maxValue - minValue || 1;
+
+            // Draw axes
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.stroke();
+            
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // Draw grid lines and labels
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+
+            const stepCount = Math.min(data.length, 7);
+            const stepSize = chartWidth / (data.length - 1);
+
+            // X-axis labels (dates)
+            for (let i = 0; i < data.length; i += Math.ceil(data.length / stepCount)) {
+                const x = padding + i * stepSize;
+                if (i < data.length) {
+                    ctx.fillText(data[i].dateLabel, x, height - padding + 15);
+                }
+            }
+
+            // Y-axis labels (values)
+            ctx.textAlign = 'right';
+            const ySteps = 5;
+            for (let i = 0; i <= ySteps; i++) {
+                const value = minValue + (valueRange * i / ySteps);
+                const y = height - padding - (chartHeight * i / ySteps);
+                ctx.fillText(value.toFixed(1), padding - 5, y + 3);
+                
+                // Grid line
+                if (i > 0) {
+                    ctx.strokeStyle = '#f3f4f6';
+                    ctx.beginPath();
+                    ctx.moveTo(padding, y);
+                    ctx.lineTo(width - padding, y);
+                    ctx.stroke();
+                }
+            }
+
+            // Draw line chart
+            ctx.strokeStyle = habit.color;
+            ctx.fillStyle = habit.color;
+            ctx.lineWidth = 2;
+
+            let firstPoint = true;
+            ctx.beginPath();
+
+            for (let i = 0; i < data.length; i++) {
+                const x = padding + i * stepSize;
+                
+                if (data[i].value !== null) {
+                    const normalizedValue = (data[i].value - minValue) / valueRange;
+                    const y = height - padding - (normalizedValue * chartHeight);
+                    
+                    if (firstPoint) {
+                        ctx.moveTo(x, y);
+                        firstPoint = false;
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+            }
+            ctx.stroke();
+
+            // Draw data points
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].value !== null) {
+                    const x = padding + i * stepSize;
+                    const normalizedValue = (data[i].value - minValue) / valueRange;
+                    const y = height - padding - (normalizedValue * chartHeight);
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fillStyle = habit.color;
+                    ctx.fill();
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function renderHabits() {
+            const container = document.getElementById('habitsContainer');
+            container.innerHTML = '';
+
+            habits.forEach(habit => {
+                const habitDiv = document.createElement('div');
+                habitDiv.className = 'habit-item';
+                
+                const currentValue = getHabitData(habit.id, selectedDate);
+                const streak = getStreak(habit.id);
+
+                habitDiv.innerHTML = `
+                    <div class="habit-header">
+                        <div class="habit-info">
+                            <div class="habit-color" style="background-color: ${habit.color}"></div>
+                            <span class="habit-name">${habit.name}</span>
+                            ${streak > 0 ? `<span class="streak-badge">🔥 ${streak}</span>` : ''}
+                        </div>
+                        <button class="delete-btn" onclick="deleteHabit(${habit.id})">🗑️</button>
+                    </div>
+                    ${renderHabitInput(habit, currentValue)}
+                    ${renderHabitStatus(habit, currentValue)}
+                `;
+
+                container.appendChild(habitDiv);
+            });
+        }
+
+        function renderHabitInput(habit, currentValue) {
+            if (habit.type === 'boolean') {
+                return `
+                    <div class="bool-buttons">
+                        <button class="bool-btn ${currentValue === true ? 'active-true' : ''}" 
+                                onclick="updateHabitValue(${habit.id}, true)">
+                            ✓
+                        </button>
+                        <button class="bool-btn ${currentValue === false ? 'active-false' : ''}" 
+                                onclick="updateHabitValue(${habit.id}, false)">
+                            ✗
+                        </button>
+                    </div>
+                `;
+            }
+            
+            if (habit.type === 'rating') {
+                const buttons = [];
+                for (let i = 1; i <= 10; i++) {
+                    buttons.push(`
+                        <button class="rating-btn ${currentValue >= i ? 'active' : ''}" 
+                                onclick="updateHabitValue(${habit.id}, ${i})">
+                            ${i}
+                        </button>
+                    `);
+                }
+                return `<div class="rating-buttons">${buttons.join('')}</div>`;
+            }
+            
+            if (habit.type === 'text') {
+                return `
+                    <textarea class="text-input" 
+                              placeholder="${habit.name === 'Gratitude Journal' ? 'What are you grateful for today?' : 'Enter your thoughts...'}"
+                              onchange="updateHabitValue(${habit.id}, this.value)"
+                              rows="3">${currentValue || ''}</textarea>
+                `;
+            }
+            
+            return `
+                <div class="number-input-container">
+                    <input type="number" class="number-input" 
+                           placeholder="0" step="0.1" 
+                           value="${currentValue || ''}"
+                           onchange="updateHabitValue(${habit.id}, parseFloat(this.value) || 0)">
+                    <span class="unit-label">${habit.unit}</span>
+                </div>
+            `;
+        }
+
+        function renderHabitStatus(habit, currentValue) {
+            if (currentValue !== null && currentValue !== false && currentValue !== '' && currentValue !== 0) {
+                let statusText = '';
+                if (habit.type === 'boolean' && currentValue) {
+                    statusText = '✅ Completed';
+                } else if (habit.type === 'rating') {
+                    statusText = `⭐ Rated: ${currentValue}/10`;
+                } else if (habit.type === 'text') {
+                    statusText = '📝 Journal entry saved';
+                } else {
+                    statusText = `📊 Logged: ${currentValue} ${habit.unit}`;
+                }
+                return `<div class="habit-status">${statusText}</div>`;
+            }
+            return '';
+        }
+
+        function addHabit() {
+            const name = document.getElementById('newHabitName').value.trim();
+            const type = document.getElementById('newHabitType').value;
+            const unit = document.getElementById('newHabitUnit').value.trim();
+
+            if (!name) return;
+
+            const newHabit = {
+                id: Math.max(...habits.map(h => h.id), 0) + 1,
+                name: name,
+                type: type,
+                unit: unit,
+                color: `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`
+            };
+
+            habits.push(newHabit);
+            localStorage.setItem('standaloneHabits', JSON.stringify(habits));
+
+            cancelAddHabit();
+            renderHabits();
+            updateStats();
+            updateChartSelector();
+        }
+
+        function cancelAddHabit() {
+            document.getElementById('addHabitBtn').classList.remove('hidden');
+            document.getElementById('addHabitForm').classList.add('hidden');
+            document.getElementById('newHabitName').value = '';
+            document.getElementById('newHabitUnit').value = '';
+            document.getElementById('newHabitType').value = 'boolean';
+            document.getElementById('newHabitUnit').classList.add('hidden');
+        }
+
+        function deleteHabit(habitId) {
+            habits = habits.filter(h => h.id !== habitId);
+            localStorage.setItem('standaloneHabits', JSON.stringify(habits));
+            renderHabits();
+            updateMountain();
+            updateStats();
+            updateChartSelector();
+            
+            // Clear chart if deleted habit was selected
+            const selectedHabitId = document.getElementById('chartHabitSelect').value;
+            if (selectedHabitId && parseInt(selectedHabitId) === habitId) {
+                document.getElementById('chartContainer').innerHTML = '<div class="no-data">Select a habit to view its progress chart</div>';
+            }
+        }
+
+        function updateStats() {
+            const completedHabits = habits.filter(h => {
+                const value = getHabitData(h.id, selectedDate);
+                return value !== null && value !== false && value !== 0 && value !== '';
+            }).length;
+
+            document.getElementById('completedCount').textContent = completedHabits;
+            document.getElementById('totalCount').textContent = habits.length;
+            
+            if (habits.length === 16) {
+                document.getElementById('successMessage').classList.remove('hidden');
+            }
+
+            // Update motivation text
+            const progressPercent = habits.length > 0 ? completedHabits / habits.length : 0;
+            const motivationEl = document.getElementById('motivationText');
+            
+            if (progressPercent === 1) {
+                motivationEl.textContent = '🏔️ SUMMIT REACHED! Perfect day!';
+                motivationEl.style.color = '#ca8a04';
+            } else if (progressPercent >= 0.8) {
+                motivationEl.textContent = '🔥 Almost there! Push to the summit!';
+                motivationEl.style.color = '#ea580c';
+            } else if (progressPercent >= 0.5) {
+                motivationEl.textContent = '⛰️ Great progress! Keep climbing!';
+                motivationEl.style.color = '#2563eb';
+            } else if (progressPercent > 0) {
+                motivationEl.textContent = '🥾 Good start! Every step counts!';
+                motivationEl.style.color = '#16a34a';
+            } else {
+                motivationEl.textContent = '🏔️ Ready to start your climb?';
+                motivationEl.style.color = '#6b7280';
+            }
+        }
+
+        function updateMountain() {
+            const completedHabits = habits.filter(h => {
+                const value = getHabitData(h.id, selectedDate);
+                return value !== null && value !== false && value !== 0 && value !== '';
+            }).length;
+
+            const progressPercent = habits.length > 0 ? completedHabits / habits.length : 0;
+            const svg = document.getElementById('mountainSvg');
+            
+            // Remove existing dynamic elements
+            const existingMarkers = svg.querySelectorAll('.progress-marker, .climber, .progress-text');
+            existingMarkers.forEach(el => el.remove());
+
+            // Add progress markers
+            const positions = [
+                {x: 20, y: 140},   // Start
+                {x: 60, y: 125},   // 25%
+                {x: 120, y: 110},  // 50%
+                {x: 170, y: 85},   // 75%
+                {x: 210, y: 65},   // 90%
+                {x: 250, y: 35}    // Summit
+            ];
+
+            for (let i = 0; i < 6; i++) {
+                const markerThreshold = i / 5;
+                const isReached = progressPercent >= markerThreshold;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', positions[i].x);
+                circle.setAttribute('cy', positions[i].y);
+                circle.setAttribute('r', '3');
+                circle.setAttribute('fill', isReached ? '#FFD700' : '#CCCCCC');
+                circle.setAttribute('stroke', '#333');
+                circle.setAttribute('stroke-width', '1');
+                circle.classList.add('progress-marker');
+                svg.appendChild(circle);
+
+                // Summit flag
+                if (i === 5 && isReached) {
+                    const flag = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    flag.innerHTML = `
+                        <line x1="250" y1="35" x2="250" y2="25" stroke="#8B4513" stroke-width="2"/>
+                        <polygon points="250,25 265,30 250,35" fill="#FF0000"/>
+                        <text x="255" y="22" font-size="8" fill="#333">SUMMIT!</text>
+                    `;
+                    flag.classList.add('progress-marker');
+                    svg.appendChild(flag);
+                }
+            }
+
+            // Add climber
+            let climberX, climberY;
+            if (progressPercent <= 0.2) {
+                const segmentProgress = progressPercent / 0.2;
+                climberX = 20 + (60 - 20) * segmentProgress;
+                climberY = 140 - (140 - 125) * segmentProgress;
+            } else if (progressPercent <= 0.4) {
+                const segmentProgress = (progressPercent - 0.2) / 0.2;
+                climberX = 60 + (120 - 60) * segmentProgress;
+                climberY = 125 - (125 - 110) * segmentProgress;
+            } else if (progressPercent <= 0.6) {
+                const segmentProgress = (progressPercent - 0.4) / 0.2;
+                climberX = 120 + (170 - 120) * segmentProgress;
+                climberY = 110 - (110 - 85) * segmentProgress;
+            } else if (progressPercent <= 0.8) {
+                const segmentProgress = (progressPercent - 0.6) / 0.2;
+                climberX = 170 + (210 - 170) * segmentProgress;
+                climberY = 85 - (85 - 65) * segmentProgress;
+            } else {
+                const segmentProgress = (progressPercent - 0.8) / 0.2;
+                climberX = 210 + (250 - 210) * segmentProgress;
+                climberY = 65 - (65 - 35) * segmentProgress;
+            }
+
+            const climber = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            climber.setAttribute('transform', `translate(${climberX - 5}, ${climberY - 15})`);
+            climber.classList.add('climber');
+            
+            climber.innerHTML = `
+                <!-- Head -->
+                <circle cx="5" cy="3" r="2" fill="#FFDBAC" stroke="#333" stroke-width="0.5"/>
+                
+                <!-- Body -->
+                <line x1="5" y1="5" x2="5" y2="12" stroke="#333" stroke-width="1.5"/>
+                
+                <!-- Arms -->
+                <line x1="5" y1="7" x2="${progressPercent > 0.5 ? '8' : '2'}" y2="${progressPercent > 0.5 ? '5' : '9'}" stroke="#333" stroke-width="1"/>
+                <line x1="5" y1="7" x2="${progressPercent > 0.5 ? '2' : '8'}" y2="${progressPercent > 0.5 ? '5' : '9'}" stroke="#333" stroke-width="1"/>
+                
+                <!-- Legs -->
+                <line x1="5" y1="12" x2="3" y2="16" stroke="#333" stroke-width="1"/>
+                <line x1="5" y1="12" x2="7" y2="16" stroke="#333" stroke-width="1"/>
+                
+                <!-- Backpack -->
+                <rect x="6" y="6" width="2" height="4" fill="#8B4513" rx="0.5"/>
+                
+                ${progressPercent === 1 ? `
+                    <text x="8" y="2" font-size="6" fill="#FFD700">🎉</text>
+                    <text x="5" y="20" font-size="4" fill="#333" text-anchor="middle">YOU DID IT!</text>
+                ` : ''}
+            `;
+            
+            svg.appendChild(climber);
+
+            // Add progress text
+            const progressText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            progressText.setAttribute('x', '150');
+            progressText.setAttribute('y', '190');
+            progressText.setAttribute('text-anchor', 'middle');
+            progressText.setAttribute('font-size', '12');
+            progressText.setAttribute('fill', '#333');
+            progressText.setAttribute('font-weight', 'bold');
+            progressText.textContent = `${completedHabits}/${habits.length} Habits Complete - ${Math.round(progressPercent * 100)}% to Summit!`;
+            progressText.classList.add('progress-text');
+            svg.appendChild(progressText);
+        }
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
